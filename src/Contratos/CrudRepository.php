@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-
+// Contrato principal del repositorio CRUD
 namespace App\Contratos;
 
 interface CrudRepository
