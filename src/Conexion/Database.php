@@ -7,7 +7,7 @@ namespace App\Conexion;
 use PDO;
 use PDOException;
 use RuntimeException;
-
+// Conexión PDO
 final class Database
 {
     private static ?PDO $connection = null;
