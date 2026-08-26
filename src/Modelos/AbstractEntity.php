@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modelos;
 
+/**
+ * Entidad base para los modelos del sistema.
+ *
+ * Define los atributos y comportamientos comunes
+ * que pueden compartir las entidades del dominio.
+ */
 abstract class AbstractEntity
 {
     public function __construct(
