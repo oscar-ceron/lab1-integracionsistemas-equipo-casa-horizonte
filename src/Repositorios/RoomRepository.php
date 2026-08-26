@@ -14,58 +14,68 @@ final class RoomRepository implements CrudRepository
     {
     }
 
-    public function all(): array
+    public function obtenerTodos(): array
     {
         $statement = $this->database->query(
-            'SELECT id, number, type, capacity, price, description FROM rooms ORDER BY number'
+            'SELECT id, number, type, capacity, price, description
+             FROM rooms
+             ORDER BY number'
         );
 
         return $statement->fetchAll();
     }
 
-    public function find(int $id): ?array
+    public function obtenerPorId(int $id): ?array
     {
-        // P: ¿Que pasaria sin parametros? Un id manipulado podria cambiar la condicion
-        // WHERE y exponer registros. El parametro nombrado lo trata como dato.
         $statement = $this->database->prepare(
-            'SELECT id, number, type, capacity, price, description FROM rooms WHERE id = :id'
+            'SELECT id, number, type, capacity, price, description
+             FROM rooms
+             WHERE id = :id'
         );
+
         $statement->execute(['id' => $id]);
+
         $room = $statement->fetch();
 
         return $room ?: null;
     }
 
-    public function create(array $data): int
+    public function crear(array $datos): bool
     {
-        // INSERT usa prepare/execute: los valores del formulario no forman parte del SQL.
         $statement = $this->database->prepare(
-            'INSERT INTO rooms (number, type, capacity, price, description, created_at, updated_at)
-             VALUES (:number, :type, :capacity, :price, :description, NOW(), NOW())'
+            'INSERT INTO rooms
+                (number, type, capacity, price, description, created_at, updated_at)
+             VALUES
+                (:number, :type, :capacity, :price, :description, NOW(), NOW())'
         );
-        $statement->execute($data);
 
-        return (int) $this->database->lastInsertId();
+        return $statement->execute($datos);
     }
 
-    public function update(int $id, array $data): bool
+    public function actualizar(int $id, array $datos): bool
     {
-        // La misma estrategia protege la edicion y mantiene separado el SQL de los datos.
-        $data['id'] = $id;
+        $datos['id'] = $id;
+
         $statement = $this->database->prepare(
             'UPDATE rooms
-             SET number = :number, type = :type, capacity = :capacity, price = :price,
-                 description = :description, updated_at = NOW()
+             SET number = :number,
+                 type = :type,
+                 capacity = :capacity,
+                 price = :price,
+                 description = :description,
+                 updated_at = NOW()
              WHERE id = :id'
         );
 
-        return $statement->execute($data);
+        return $statement->execute($datos);
     }
 
-    public function delete(int $id): bool
+    public function eliminar(int $id): bool
     {
-        // DELETE tambien recibe el id como parametro, nunca mediante concatenacion de texto.
-        $statement = $this->database->prepare('DELETE FROM rooms WHERE id = :id');
+        $statement = $this->database->prepare(
+            'DELETE FROM rooms
+             WHERE id = :id'
+        );
 
         return $statement->execute(['id' => $id]);
     }
