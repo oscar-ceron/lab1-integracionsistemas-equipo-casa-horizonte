@@ -58,6 +58,8 @@ $env:APP_URL="http://localhost:8000"
 $env:APP_KEY="cambia-esta-clave-secreta"
 ```
 
+No guardes las credenciales SMTP en el repositorio ni las incluyas en capturas de pantalla. Define estas variables en la misma sesión donde iniciarás PHP. Si usas otro proveedor, sustituye `MAIL_HOST`, `MAIL_PORT` y el tipo de cifrado configurado en `src/Servicios/Mailer.php`.
+
 5. Iniciar el servidor local:
 
 ```bash
@@ -104,9 +106,13 @@ Abrir `http://localhost:8000`.
 
 Para Gmail, activa la verificación en dos pasos y crea una **contraseña de aplicación** en tu cuenta de Google. Colócala en `MAIL_PASSWORD`, sin espacios; no uses la contraseña normal de Gmail. Cambia `tu-correo@gmail.com` por la cuenta que enviará los mensajes. Después ejecuta `composer install` para instalar PHPMailer. Si Gmail rechaza el envío, la reserva ya guardada se conserva y la aplicación muestra la confirmación visual.
 
+Para probar el envío, inicia la aplicación, registra una reserva con un correo que puedas consultar y revisa también la carpeta de spam. Los errores de autenticación suelen indicar que la contraseña de aplicación es incorrecta; un error de conexión normalmente apunta a `MAIL_HOST`, `MAIL_PORT`, firewall o a las variables no definidas en la sesión actual. `APP_URL` debe apuntar a la dirección pública de la aplicación cuando el enlace de verificación del correo o del QR se vaya a abrir desde otro equipo.
+
 ## Uso de IA
 
-Se utilizó GitHub Copilot como apoyo para proponer la estructura inicial, revisar sintaxis y sugerir estilos de interfaz. El equipo validó y corrigió el resultado ejecutando el lint de PHP, revisando las consultas preparadas, probando manualmente el CRUD y verificando el diseño en navegador. Las decisiones finales y la explicación técnica deben ser comprendidas y defendidas por los cuatro integrantes.
+Se utilizó GitHub Copilot como apoyo para proponer la estructura inicial, revisar sintaxis y sugerir estilos de interfaz. Algunos ejemplos de solicitudes fueron: diseñar un formulario responsive para habitaciones y reservas, revisar validaciones de fechas y disponibilidad, explicar el uso de `PDO::prepare()` y documentar la configuración SMTP con PHPMailer.
+
+La IA no reemplazó la revisión del equipo: cada sugerencia se contrastó con el esquema SQL y las clases existentes, se corrigieron las respuestas que no coincidían con el dominio y se validó el resultado ejecutando el lint de PHP, revisando las consultas preparadas, probando manualmente el CRUD y verificando el diseño en navegador. Las decisiones finales y la explicación técnica deben ser comprendidas y defendidas por los cuatro integrantes.
 
 ## Proceso Kanban
 

@@ -237,24 +237,12 @@ $isEditing = is_array($editingRoom);
         <section class="reservation-area" id="historial-reservas">
             <div class="section-heading">
                 <div>
-                    <div class="eyebrow">Atencion al huesped</div>
-                    <h3>Crear una reserva</h3>
+                    <div class="eyebrow">Control administrativo</div>
+                    <h3>Historial de reservas</h3>
                 </div>
-                <span class="section-note">Confirmacion inmediata</span>
+                <span class="section-note">Gestion y comprobantes</span>
             </div>
-            <div class="reservation-grid">
-                <form class="panel form-panel" method="post">
-                    <input type="hidden" name="action" value="create-reservation">
-                    <div class="field"><label for="guest_name">Nombre del huesped *</label><input id="guest_name" name="guest_name" required maxlength="150" value="<?= escape($_POST['guest_name'] ?? '') ?>" placeholder="Nombre completo"></div>
-                    <div class="field"><label for="guest_email">Correo electronico *</label><input id="guest_email" name="guest_email" type="email" required maxlength="200" value="<?= escape($_POST['guest_email'] ?? '') ?>" placeholder="huesped@correo.com"></div>
-                    <div class="field"><label for="room_id">Habitacion *</label><select class="form-select" id="room_id" name="room_id" required>
-                        <option value="">Selecciona una habitacion</option>
-                        <?php foreach ($reservationRooms as $room): ?><option value="<?= escape($room['id']) ?>" <?= ((string) ($_POST['room_id'] ?? '') === (string) $room['id']) ? 'selected' : '' ?>>Habitacion <?= escape($room['number']) ?> · <?= escape($room['type']) ?> · $<?= number_format((float) $room['price'], 2) ?>/noche</option><?php endforeach; ?>
-                    </select></div>
-                    <div class="date-grid"><div class="field"><label for="start_date">Entrada *</label><input id="start_date" name="start_date" type="date" min="<?= date('Y-m-d') ?>" required value="<?= escape($_POST['start_date'] ?? '') ?>"></div><div class="field"><label for="end_date">Salida *</label><input id="end_date" name="end_date" type="date" min="<?= date('Y-m-d', strtotime('+1 day')) ?>" required value="<?= escape($_POST['end_date'] ?? '') ?>"></div></div>
-                    <button class="button" type="submit">Confirmar reserva</button>
-                </form>
-                <div class="panel reservation-list">
+            <div class="panel reservation-list">
                     <div class="panel-header"><h3>Reservas recientes</h3><span class="eyebrow"><?= count($reservations) ?> reservas</span></div>
                     <?php if ($reservations === []): ?><div class="empty">Todavia no hay reservas registradas.</div><?php else: ?>
                         <?php foreach ($reservations as $reservation): ?>
@@ -264,7 +252,6 @@ $isEditing = is_array($editingRoom);
                             </article>
                         <?php endforeach; ?>
                     <?php endif; ?>
-                </div>
             </div>
         </section>
         </section>
