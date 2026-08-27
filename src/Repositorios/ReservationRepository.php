@@ -40,7 +40,7 @@ final class ReservationRepository
     public function find(int $id): ?array
     {
         $statement = $this->database->prepare(
-            'SELECT r.id, r.start_date, r.end_date, r.status, r.total,
+            'SELECT r.id, r.room_id, r.start_date, r.end_date, r.status, r.total,
                     rm.number AS room_number, rm.type AS room_type,
                     u.name AS guest_name, u.email AS guest_email
              FROM reservations r
@@ -65,18 +65,21 @@ final class ReservationRepository
         return $room ?: null;
     }
 
-    public function hasConflict(int $roomId, string $startDate, string $endDate): bool
+    public function hasConflict(int $roomId, string $startDate, string $endDate, ?int $excludeId = null): bool
     {
         $statement = $this->database->prepare(
             'SELECT COUNT(*) FROM reservations
              WHERE room_id = :room_id AND status <> :cancelled
-               AND start_date < :end_date AND end_date > :start_date'
+               AND start_date < :end_date AND end_date > :start_date
+               AND (:exclude_id_check IS NULL OR id <> :exclude_id)'
         );
         $statement->execute([
             'room_id' => $roomId,
             'cancelled' => 'cancelled',
             'start_date' => $startDate,
             'end_date' => $endDate,
+            'exclude_id_check' => $excludeId,
+            'exclude_id' => $excludeId,
         ]);
 
         return (int) $statement->fetchColumn() > 0;
@@ -121,10 +124,40 @@ final class ReservationRepository
 
     public function cancel(int $id): bool
     {
+        // Cancelar conserva el registro para mantener el historial de la reservacion.
         $statement = $this->database->prepare(
             'UPDATE reservations SET status = :status, updated_at = NOW() WHERE id = :id'
         );
 
         return $statement->execute(['status' => 'cancelled', 'id' => $id]);
+    }
+
+    public function update(int $id, array $data): bool
+    {
+        // La edicion solo cambia datos propios de la reserva; el huesped se mantiene intacto.
+        $data['id'] = $id;
+        $statement = $this->database->prepare(
+            'UPDATE reservations
+             SET room_id = :room_id, start_date = :start_date, end_date = :end_date,
+                 status = :status, total = :total, updated_at = NOW()
+             WHERE id = :id'
+        );
+
+        return $statement->execute([
+            'id' => $data['id'],
+            'room_id' => $data['room_id'],
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'],
+            'status' => $data['status'] ?? 'pending',
+            'total' => $data['total'] ?? null,
+        ]);
+    }
+
+    public function delete(int $id): bool
+    {
+        // DELETE elimina definitivamente; para la operacion habitual se recomienda cancel().
+        $statement = $this->database->prepare('DELETE FROM reservations WHERE id = :id');
+
+        return $statement->execute(['id' => $id]);
     }
 }

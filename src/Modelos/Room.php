@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace App\Modelos;
 
-/**
- * Modelo que representa una habitación del sistema.
- *
- * Extiende AbstractEntity para reutilizar los atributos
- * y comportamientos comunes de las entidades del dominio.
- */
 final class Room extends AbstractEntity
 {
     public function __construct(

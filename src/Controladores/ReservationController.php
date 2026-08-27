@@ -92,4 +92,50 @@ final class ReservationController
     {
         return $this->reservations->cancel($id);
     }
+
+    public function update(int $id, array $input): bool
+    {
+        // La actualizacion reutiliza las mismas reglas para evitar reservas invalidas.
+        $reservation = $this->reservations->find($id);
+        if ($reservation === null) {
+            throw new InvalidArgumentException('La reserva seleccionada no existe.');
+        }
+
+        $roomId = filter_var($input['room_id'] ?? null, FILTER_VALIDATE_INT);
+        $startDate = trim((string) ($input['start_date'] ?? ''));
+        $endDate = trim((string) ($input['end_date'] ?? ''));
+        $status = trim((string) ($input['status'] ?? $reservation['status']));
+        $start = DateTimeImmutable::createFromFormat('Y-m-d', $startDate);
+        $end = DateTimeImmutable::createFromFormat('Y-m-d', $endDate);
+
+        if ($roomId === false || $roomId < 1 || !$start || !$end
+            || $start->format('Y-m-d') !== $startDate || $end->format('Y-m-d') !== $endDate
+            || $start < new DateTimeImmutable('today') || $end <= $start
+            || !in_array($status, ['pending', 'confirmed', 'cancelled'], true)) {
+            throw new InvalidArgumentException('Los datos de la reserva no son validos.');
+        }
+
+        $room = $this->reservations->findRoom($roomId);
+        if ($room === null) {
+            throw new InvalidArgumentException('La habitacion seleccionada no existe.');
+        }
+
+        if ($this->reservations->hasConflict($roomId, $startDate, $endDate, $id)) {
+            throw new InvalidArgumentException('La habitacion ya esta reservada en esas fechas.');
+        }
+
+        $nights = (int) $start->diff($end)->days;
+        return $this->reservations->update($id, [
+            'room_id' => $roomId,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'status' => $status,
+            'total' => $nights * (float) $room['price'],
+        ]);
+    }
+
+    public function delete(int $id): bool
+    {
+        return $this->reservations->delete($id);
+    }
 }

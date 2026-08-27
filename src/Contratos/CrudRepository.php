@@ -1,18 +1,21 @@
 <?php
 
 declare(strict_types=1);
-// Contrato principal del repositorio CRUD
+
 namespace App\Contratos;
 
 interface CrudRepository
 {
-    public function obtenerTodos(): array;
+    // P: ¿Por que interfaz en vez de solo herencia? R: obliga a cumplir el contrato
+    // CRUD, permite varias implementaciones y evita acoplar el controlador a una clase.
+    // Un repositorio nuevo solo debe cumplir estas operaciones CRUD.
+    public function all(): array;
 
-    public function obtenerPorId(int $id): ?array;
+    public function find(int $id): ?array;
 
-    public function crear(array $datos): bool;
+    public function create(array $data): int;
 
-    public function actualizar(int $id, array $datos): bool;
+    public function update(int $id, array $data): bool;
 
-    public function eliminar(int $id): bool;
-} 
+    public function delete(int $id): bool;
+}

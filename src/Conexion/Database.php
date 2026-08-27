@@ -7,7 +7,7 @@ namespace App\Conexion;
 use PDO;
 use PDOException;
 use RuntimeException;
-// Conexión PDO
+
 final class Database
 {
     private static ?PDO $connection = null;
@@ -27,9 +27,13 @@ final class Database
         $dsn = "mysql:host={$host};port={$port};dbname={$name};charset=utf8mb4";
 
         try {
+            // P: ¿Como se maneja un error de conexion? PDO lanza una excepcion y este
+            // bloque la transforma en un RuntimeException sin mostrar credenciales.
             self::$connection = new PDO($dsn, $user, $pass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                // P: ¿Que riesgo se evita? Con prepare() y emulacion desactivada,
+                // un valor como '1 OR 1=1' queda como dato y no altera el SQL.
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
         } catch (PDOException $exception) {
@@ -55,7 +59,7 @@ final class Database
             [$key, $value] = explode('=', $line, 2);
             $key = trim($key);
             $value = trim($value);
-            $value = trim($value, "\" '");
+            $value = trim($value, "\\\"'");
             if ($key !== '' && getenv($key) === false) {
                 putenv($key . '=' . $value);
             }

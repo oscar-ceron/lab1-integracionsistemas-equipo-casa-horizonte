@@ -13,6 +13,7 @@ final class ReservationDocument
 {
     public function pdf(array $reservation): string
     {
+        // El PDF es el comprobante descargable y contiene un QR firmado para verificarlo.
         $appUrl = rtrim(getenv('APP_URL') ?: 'http://localhost:8000', '/');
         $appKey = getenv('APP_KEY') ?: 'casa-horizonte-local-key';
         $reservationId = (int) $reservation['id'];

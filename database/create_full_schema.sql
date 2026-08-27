@@ -1,7 +1,7 @@
 -- create_full_schema.sql
 CREATE DATABASE IF NOT EXISTS `org_chart` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `org_chart`;
- 
+
 -- positions
 CREATE TABLE IF NOT EXISTS `positions` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `positions` (
   `created_at` TIMESTAMP NULL,
   `updated_at` TIMESTAMP NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
- 
+
 -- users (mínimo). Si ya tienes users en Laravel, omite/ajusta.
 CREATE TABLE IF NOT EXISTS `users` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `created_at` TIMESTAMP NULL,
   `updated_at` TIMESTAMP NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
- 
+
 -- rooms (habitaciones)
 CREATE TABLE IF NOT EXISTS `rooms` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `rooms` (
   `created_at` TIMESTAMP NULL,
   `updated_at` TIMESTAMP NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
- 
+
 -- org_units (organigrama)
 CREATE TABLE IF NOT EXISTS `org_units` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -53,11 +53,11 @@ CREATE TABLE IF NOT EXISTS `org_units` (
   CONSTRAINT `fk_org_position` FOREIGN KEY (`position_id`) REFERENCES `positions`(`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_org_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
- 
+
 -- self-referential FK (parent_id). Si falla por orden, ejecuta el ALTER después.
 ALTER TABLE `org_units`
   ADD CONSTRAINT `fk_org_parent` FOREIGN KEY (`parent_id`) REFERENCES `org_units`(`id`) ON DELETE SET NULL;
- 
+
 -- reservations (reservas)
 CREATE TABLE IF NOT EXISTS `reservations` (
   `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -74,14 +74,14 @@ CREATE TABLE IF NOT EXISTS `reservations` (
   CONSTRAINT `fk_res_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL,
   INDEX (`room_id`,`start_date`,`end_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
- 
+
 -- Datos de ejemplo: posiciones mínimas
 INSERT INTO `positions` (`title`,`level`,`description`,`created_at`,`updated_at`)
   VALUES ('CEO',1,'Director general',NOW(),NOW()),
          ('CTO',2,'Director técnico',NOW(),NOW()),
          ('Developer',4,'Desarrollador',NOW(),NOW())
   ON DUPLICATE KEY UPDATE title=VALUES(title);
- 
+
 -- Inserción de 40 habitaciones de ejemplo (si ya las insertaste antes, ignora o elimina duplicados)
 INSERT INTO `rooms` (`number`,`type`,`capacity`,`price`,`description`,`created_at`,`updated_at`) VALUES
 ('101','Single',1,30.00,'Habitación individual económica',NOW(),NOW()),
@@ -123,4 +123,4 @@ INSERT INTO `rooms` (`number`,`type`,`capacity`,`price`,`description`,`created_a
 ('217','Double',2,51.00,'Doble estándar',NOW(),NOW()),
 ('218','Double',2,53.00,'Doble con balcón',NOW(),NOW()),
 ('219','Single',1,26.00,'Individual económica',NOW(),NOW()),
-('220','Suite',4,170.00,'Suite ejecutiva',NOW(),NOW()); 
+('220','Suite',4,170.00,'Suite ejecutiva',NOW(),NOW());

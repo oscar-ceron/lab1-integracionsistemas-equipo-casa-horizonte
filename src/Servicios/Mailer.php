@@ -20,6 +20,7 @@ final class Mailer
         float $total,
         int $reservationId
     ): void {
+        // Las credenciales se leen del entorno para no guardar secretos en el repositorio.
         $username = getenv('MAIL_USERNAME') ?: '';
         $password = getenv('MAIL_PASSWORD') ?: '';
         $from = getenv('MAIL_FROM') ?: $username;
@@ -51,6 +52,7 @@ final class Mailer
                 'status' => 'confirmed',
                 'total' => $total,
             ];
+            // Se adjunta el mismo comprobante PDF que el usuario puede descargar desde la web.
             $pdf = (new ReservationDocument())->pdf($reservation);
             $mailer->addStringAttachment(
                 $pdf,
